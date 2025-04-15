@@ -1,12 +1,17 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const User = require("../models/User");
+const { uploadProfilePic } = require('../middleware/upload');
+const {
+  createUserProfile,
+  updateUserProfile,
+  getUserProfile
+} = require('../controller/userController');
 
-const {getAllUsers , getUserById, updateUserProfile} = require("../controllers/userController");
-const { isAuthenticated } = require("../middlewares/authMiddleware");
 
-router.get("/", isAuthenticated, getAllUsers);  //GET /api/users
-router.get("/:id", isAuthenticated, getUserById);  //GET/api/users/:id
-router.put("/:id", isAuthenticated, updateUserProfile);  //PUT /api/users/:id
+// Routes
+router.post('/create-user', uploadProfilePic.single('profilePic'), createUserProfile);
+router.get('/:id', getUserProfile);
+router.put('/update-profile/:id', uploadProfilePic.single('profilePic'), updateUserProfile);
+
 
 module.exports = router;

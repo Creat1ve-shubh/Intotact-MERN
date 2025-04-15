@@ -10,15 +10,20 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  profilePic: {
+    type: String,
+    required: true
+  },
   password: {
     type: String,
     required: true
   },
   role: {
     type: String,
-    enum: ['Student', 'Tutor', 'Admin'],
-    default: 'Student'
-  }
+    enum: ['user', 'admin','Tutor'],
+    required: true,
+    default: 'user'
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
