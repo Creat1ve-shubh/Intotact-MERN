@@ -20,11 +20,10 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['user', 'admin','Tutor'],
+    enum: ['student', 'admin', 'Tutor'],
     required: true,
     default: 'user'
   },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
- 

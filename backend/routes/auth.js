@@ -1,23 +1,31 @@
-const express = require("express");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const express = require('express');
 const router = express.Router();
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
-// Register
-router.post("/register", async (req, res) => {
-    const { name, email, password } = req.body;
+// @route   POST /api/auth/register
+router.post('/register', async (req, res) => {
     try {
+        const { name, email, password, role, profilePic } = req.body;
+
+        if (!name || !email || !password || !role || !profilePic) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
+
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: "User already exists" });
+        if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await User.create({ name, email, password: hashedPassword });
 
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-        res.status(201).json({ user, token });
+        const user = new User({ name, email, password: hashedPassword, role, profilePic });
+        await user.save();
+
+        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
+        res.status(201).json({ token, user: { id: user._id, name: user.name, role: user.role } });
     } catch (err) {
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
 
